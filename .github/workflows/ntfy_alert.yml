@@ -1,0 +1,40 @@
+name: Dispatch NTFY Alert
+
+on:
+  workflow_dispatch:
+    inputs:
+      rate:
+        description: 'New peak rate'
+        required: true
+      prev_high:
+        description: 'Previous benchmark rate'
+        required: true
+      source:
+        description: 'Source currency'
+        required: true
+        default: 'USD'
+      target:
+        description: 'Target currency'
+        required: true
+        default: 'EUR'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Notification to NTFY
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          RATE: ${{ inputs.rate }}
+          PREV_HIGH: ${{ inputs.prev_high }}
+          SOURCE: ${{ inputs.source }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          WISE_URL="https://wise.com/send?sourceCurrency=${SOURCE}&targetCurrency=${TARGET}"
+          curl -fsSL -X POST "https://ntfy.sh/${NTFY_TOPIC}" \
+            -H "Title: Wise Peak: ${SOURCE}/${TARGET} hit ${RATE}" \
+            -H "Priority: high" \
+            -H "Tags: chart_with_upwards_trend,moneybag" \
+            -H "Click: ${WISE_URL}" \
+            -H "Actions: view, Open Wise Transfer, ${WISE_URL}" \
+            -d "Wise rate crossed benchmark! New Peak: ${RATE} (Previous: ${PREV_HIGH})"

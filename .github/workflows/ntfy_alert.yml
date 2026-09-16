@@ -30,11 +30,18 @@ jobs:
           SOURCE: ${{ inputs.source }}
           TARGET: ${{ inputs.target }}
         run: |
-          WISE_URL="https://wise.com/send?sourceCurrency=${SOURCE}&targetCurrency=${TARGET}"
+          BODY=$(cat <<EOF
+          **Wise rate reached a new peak!**
+
+          • **New Peak:** \`${RATE}\`
+          • **Previous Benchmark:** \`${PREV_HIGH}\`
+          EOF
+          )
+
           curl -fsSL -X POST "https://ntfy.sh/${NTFY_TOPIC}" \
-            -H "Title: Wise Peak: ${SOURCE}/${TARGET} hit ${RATE}" \
+            -H "Title: Wise Rate Peak: ${SOURCE}/${TARGET} hit ${RATE}" \
             -H "Priority: high" \
             -H "Tags: chart_with_upwards_trend,moneybag" \
-            -H "Click: ${WISE_URL}" \
-            -H "Actions: view, Open Wise Transfer, ${WISE_URL}" \
-            -d "Wise rate crossed benchmark! New Peak: ${RATE} (Previous: ${PREV_HIGH})"
+            -H "Markdown: yes" \
+            -H "Click: https://wise.com/send?sourceCurrency=${SOURCE}&targetCurrency=${TARGET}" \
+            -d "${BODY}"

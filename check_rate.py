@@ -60,11 +60,11 @@ def save_highest_rate(pair_key: str, rate: float):
 def send_ntfy_alert(rate: float, prev_high: float, source: str, target: str, topic: str):
     url = f"https://ntfy.sh/{topic}"
     message = (
-        f"Wise rate for {source}/{target} reached a new peak: {rate:.4f}\n"
-        f"Previous benchmark: {prev_high:.4f}"
+        f"Wise rate for {source}/{target} reached a new peak: {rate}\n"
+        f"Previous benchmark: {prev_high}"
     )
     headers = {
-        "Title": f"Wise Rate Peak: {source}/{target} hit {rate:.4f}",
+        "Title": f"Wise Rate Peak: {source}/{target} hit {rate}",
         "Priority": "high",
         "Tags": "chart_with_upwards_trend,moneybag",
     }
@@ -78,8 +78,8 @@ def main():
     last_highest = load_highest_rate(pair_key, INITIAL_THRESHOLD)
 
     print(f"Currency Pair:    {pair_key}")
-    print(f"Current Rate:     {current_rate:.4f}")
-    print(f"Benchmark/Peak:   {last_highest:.4f}")
+    print(f"Current Rate:     {current_rate}")
+    print(f"Benchmark/Peak:   {last_highest}")
 
     if current_rate > last_highest:
         print("New peak reached! Sending push notification...")
